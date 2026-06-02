@@ -1,0 +1,2 @@
+# public/ — static files served as-is at "/": favicon, og-image, robots.txt.
+# Reference by URL string (e.g. /og.png). Imported media goes in src/assets/.

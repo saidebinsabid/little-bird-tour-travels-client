@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* ── Design tokens (Tailwind v4 @theme) ───────────────────────────────────
+   Travel-friendly palette: deep teal (brand) + warm amber (accent/CTA). */
+@theme {
+  --color-brand: #15257d; /* deep navy — matches Little Bird logo + gozayaan */
+  --color-brand-dark: #0d1857; /* darker navy — headers/footers */
+  --color-brand-light: #e8ecfb; /* indigo tint — backgrounds */
+  --color-accent: #fbbf24; /* golden yellow — CTA / Search button */
+  --color-accent-dark: #f59e0b; /* amber-500 — hover */
+  --color-ink: #0f172a; /* slate-900 — headings */
+  --color-body: #334155; /* slate-700 — body text */
+  --color-muted: #64748b; /* slate-500 */
+  --color-line: #e2e8f0; /* slate-200 — borders */
+  --color-surface: #f8fafc; /* slate-50 — section bg */
+
+  --font-sans: var(--font-inter), "Hind Siliguri", system-ui, sans-serif;
+  --font-bangla: var(--font-bangla), "Hind Siliguri", system-ui, sans-serif;
+
+  --shadow-card: 0 1px 3px rgb(15 23 42 / 0.08), 0 8px 24px rgb(15 23 42 / 0.06);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #334155;
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), "Hind Siliguri", system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Bengali text gets the dedicated Bangla font for crisp rendering. */
+:lang(bn),
+.font-bangla {
+  font-family: var(--font-bangla), "Hind Siliguri", system-ui, sans-serif;
+}
+
+h1, h2, h3, h4 {
+  color: var(--color-ink);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* ── Small reusable component classes ─────────────────────────────────────
+   Primitives still live in components/ui; these are utility shortcuts. */
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .section-y {
+    @apply py-14 md:py-20;
+  }
+  .card-base {
+    @apply rounded-2xl bg-white ring-1 ring-slate-200 overflow-hidden;
+  }
+  .input-base {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-slate-800 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 placeholder:text-slate-400;
+  }
+  .link-muted {
+    @apply text-slate-500 transition hover:text-brand;
+  }
+}
+
+/* Hide scrollbar for horizontal sliders */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Line clamp helpers */
+.clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

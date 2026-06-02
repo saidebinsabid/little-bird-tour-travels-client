@@ -1,0 +1,2 @@
+# assets/ — images/lottie you IMPORT into components (bundler-optimised).
+# Files referenced by URL string go in /public instead.

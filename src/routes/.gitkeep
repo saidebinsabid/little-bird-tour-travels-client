@@ -1,0 +1,2 @@
+# routes/ — client-side role-guard components (AdminRoute, MemberRoute, ...).
+# These handle UX redirects only; the backend enforces real authorization.

@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+
+# Environment — never commit real values (keep .env.local.example)
+.env
+.env.*
+!.env.local.example
+
+# Vercel
+.vercel
+
+# Logs & OS
+*.log
+npm-debug.log*
+.DS_Store
