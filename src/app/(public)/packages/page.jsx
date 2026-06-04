@@ -6,6 +6,8 @@ import TourSearch from "@/components/search/TourSearch";
 import { PageLoader } from "@/components/ui/Loading";
 
 export const metadata = { title: "Tour Packages" };
+// Depends on URL search params + client data — render dynamically (no static prerender).
+export const dynamic = "force-dynamic";
 
 export default function PackagesPage() {
   return (

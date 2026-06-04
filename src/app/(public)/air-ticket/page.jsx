@@ -4,6 +4,8 @@ import AirTicketSection from "@/components/airticket/AirTicketSection";
 import { PageLoader } from "@/components/ui/Loading";
 
 export const metadata = { title: "Air Ticket" };
+// Depends on URL search params + client data — render dynamically (no static prerender).
+export const dynamic = "force-dynamic";
 
 export default function AirTicketPage() {
   return (

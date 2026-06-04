@@ -4,6 +4,8 @@ import PackagesBrowser from "@/components/packages/PackagesBrowser";
 import { PageLoader } from "@/components/ui/Loading";
 
 export const metadata = { title: "Hotels & Resorts" };
+// Depends on URL search params + client data — render dynamically (no static prerender).
+export const dynamic = "force-dynamic";
 
 export default function HotelsPage() {
   return (
