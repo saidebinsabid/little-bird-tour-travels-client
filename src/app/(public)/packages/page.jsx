@@ -17,7 +17,9 @@ export default function PackagesPage() {
         bg="https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=2000&q=80"
       />
       <PageSearchBar>
-        <TourSearch />
+        <Suspense fallback={null}>
+          <TourSearch />
+        </Suspense>
       </PageSearchBar>
       <Suspense fallback={<PageLoader />}>
         <PackagesBrowser showSidebar={false} />
