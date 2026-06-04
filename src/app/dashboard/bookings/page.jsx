@@ -11,7 +11,7 @@ const PAY_TONE = { unpaid: "red", partial: "accent", paid: "green", refunded: "g
 
 export default function BookingsPage() {
   const { role } = useUserRole();
-  const isStaff = ["admin", "super-admin", "agent"].includes(role);
+  const isStaff = role === "super-admin";
   const { data, isLoading } = useSecureQuery(
     "bookings-view",
     isStaff ? "/bookings" : "/bookings/me",

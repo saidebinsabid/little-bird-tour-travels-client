@@ -20,7 +20,7 @@ export default function WhyChooseUs() {
         <SectionHeading title={t("home.whyUs")} />
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {ITEMS.map((i) => (
-            <div key={i.titleKey} className="rounded-2xl bg-white p-6 text-center shadow-[var(--shadow-card)]">
+            <div key={i.titleKey} className="running-border rounded-2xl bg-white p-6 text-center shadow-[var(--shadow-card)]">
               <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-brand-light text-brand">
                 <Icon name={i.icon} className="h-8 w-8" />
               </span>

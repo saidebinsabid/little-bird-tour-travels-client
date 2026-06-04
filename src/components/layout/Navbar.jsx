@@ -13,11 +13,12 @@ import { buttonClasses } from "@/components/ui/Button";
 // Center icon+label nav (visible when the bar is solid). Icons are monochrome
 // and turn brand-blue on hover/active (both glyph and label).
 const ICON_NAV = [
+  { href: "/visa", icon: "visa", key: "nav.visa" },
+  { href: "/hajj-umrah", icon: "hajj", key: "nav.hajj" },
   { href: "/air-ticket", icon: "flight", key: "nav.airTicket" },
   { href: "/hotels", icon: "hotel", key: "nav.hotels" },
   { href: "/packages", icon: "tour", key: "nav.packages" },
-  { href: "/visa", icon: "visa", key: "nav.visa" },
-  { href: "/hajj-umrah", icon: "hajj", key: "nav.hajj" },
+  { href: "/contact", icon: "phone", key: "nav.contactUs" },
 ];
 
 // Hamburger mega-menu columns.
@@ -25,18 +26,11 @@ const MEGA = [
   {
     title: "Travel",
     items: [
+      { href: "/visa", icon: "visa", key: "nav.visa" },
+      { href: "/hajj-umrah", icon: "hajj", key: "nav.hajj" },
       { href: "/air-ticket", icon: "flight", key: "nav.airTicket" },
       { href: "/hotels", icon: "hotel", key: "nav.hotels" },
       { href: "/packages", icon: "tour", key: "nav.packages" },
-      { href: "/visa", icon: "visa", key: "nav.visa" },
-      { href: "/hajj-umrah", icon: "hajj", key: "nav.hajj" },
-    ],
-  },
-  {
-    title: "Explore",
-    items: [
-      { href: "/destinations", icon: "pin", key: "nav.destinations" },
-      { href: "/blog", icon: "blog", key: "nav.blog" },
     ],
   },
   {
@@ -44,7 +38,6 @@ const MEGA = [
     items: [
       { href: "/about", icon: "info", key: "nav.about" },
       { href: "/contact", icon: "phone", key: "nav.contact" },
-      { href: "/faq", icon: "faq", key: "nav.faq" },
     ],
   },
 ];
@@ -59,8 +52,9 @@ function MegaItem({ item, t, onClick }) {
 }
 
 export default function Navbar() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { user, logout } = useAuth();
+  const isStaff = user?.role === "super-admin";
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
@@ -86,7 +80,7 @@ export default function Navbar() {
   const dark = !solid; // transparent → light text
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${solid ? "bg-white shadow-md" : "bg-transparent"}`}>
+    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${solid ? "bg-white shadow-md" : "bg-gradient-to-b from-black/45 to-transparent"}`}>
       <div className="container-x">
         <div className={`flex items-center justify-between gap-3 transition-all ${solid ? "h-16" : "h-20"}`}>
           <Logo light={dark} />
@@ -137,7 +131,7 @@ export default function Navbar() {
         }`}
       >
         <div className="container-x py-8">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-[repeat(3,minmax(0,1fr))_320px]">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-[repeat(2,minmax(0,1fr))_320px]">
             {MEGA.map((col) => (
               <div key={col.title}>
                 <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-muted">{col.title}</h3>
@@ -151,10 +145,18 @@ export default function Navbar() {
 
             {/* Promo card */}
             <div className="rounded-2xl bg-brand-dark p-6 text-white">
-              <p className="text-xl font-bold">
-                {user ? `Hello, ${(user.name || "Traveler").split(" ")[0]}` : "Hello, Traveler"}
+              <p className="truncate text-xl font-bold">
+                {user
+                  ? `${lang === "bn" ? "স্বাগতম" : "Hello"}, ${user.name || (lang === "bn" ? "ভ্রমণকারী" : "Traveler")}`
+                  : lang === "bn" ? "স্বাগতম, ভ্রমণকারী" : "Hello, Traveler"}
               </p>
-              <p className="mt-1 text-sm text-brand-light">Get exclusive deals &amp; plan your trips!</p>
+              <p className="mt-1 text-sm text-brand-light">
+                {user
+                  ? isStaff
+                    ? lang === "bn" ? "ড্যাশবোর্ড থেকে আপনার সাইট পরিচালনা করুন।" : "Manage your site from the dashboard."
+                    : lang === "bn" ? "পরবর্তী ভ্রমণ পরিকল্পনা করুন ও বুকিং দেখুন।" : "Plan your next trip & view your bookings."
+                  : lang === "bn" ? "এক্সক্লুসিভ ডিল ও ভ্রমণ পরিকল্পনা করুন!" : "Get exclusive deals & plan your trips!"}
+              </p>
               {user ? (
                 <div className="mt-4 flex items-center gap-2">
                   <Link href="/dashboard" onClick={() => setOpen(false)} className={buttonClasses({ variant: "accent", size: "sm" })}>{t("nav.dashboard")}</Link>

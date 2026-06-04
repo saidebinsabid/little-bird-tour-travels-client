@@ -7,7 +7,7 @@ import Badge from "@/components/ui/Badge";
 import { PageLoader } from "@/components/ui/Loading";
 import { formatDate } from "@/utils/format";
 
-const ROLES = ["user", "agent", "admin", "super-admin"];
+const ROLES = ["user", "super-admin"];
 
 export default function UsersAdminPage() {
   const axiosSecure = useAxiosSecure();

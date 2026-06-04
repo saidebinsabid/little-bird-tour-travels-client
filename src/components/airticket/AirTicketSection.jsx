@@ -1,98 +1,98 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import { toast } from "react-toastify";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { useI18n } from "@/i18n/useI18n";
-import { useContentList, useCreateInquiry } from "@/hooks/useContent";
+import { useContentList } from "@/hooks/useContent";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { Input, Select } from "@/components/ui/Field";
-import Button from "@/components/ui/Button";
-import Badge from "@/components/ui/Badge";
-import { Spinner, SkeletonGrid } from "@/components/ui/Loading";
-import { priceLabel } from "@/utils/format";
+import Icon from "@/components/icons/Icon";
+import FareCard from "./FareCard";
+import { SkeletonGrid } from "@/components/ui/Loading";
+
+const norm = (s = "") => s.toLowerCase().replace(/\(.*?\)/g, "").trim();
 
 export default function AirTicketSection() {
   const { t, lang } = useI18n();
-  const { data } = useContentList("air-tickets", { status: "published", limit: 8 });
-  const { mutateAsync, isPending } = useCreateInquiry();
+  const params = useSearchParams();
+  const { data, isLoading } = useContentList("air-tickets", { status: "published", limit: 50 });
   const fares = data?.data || [];
 
-  const [form, setForm] = useState({
-    from: "", to: "", tripType: "round-trip", date: "", pax: 1, name: "", phone: "",
+  const [filter, setFilter] = useState({
+    from: params.get("from") || "",
+    to: params.get("to") || "",
+    date: params.get("depart") || "",
+    cls: params.get("cls") || "Economy",
   });
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const set = (k) => (e) => setFilter((s) => ({ ...s, [k]: e.target.value }));
 
-  const submit = async (e) => {
-    e.preventDefault();
-    if (!form.from || !form.to || !form.phone) {
-      toast.error(t("form.required"));
-      return;
-    }
-    try {
-      await mutateAsync({
-        type: "air-ticket",
-        name: form.name || "Air ticket lead",
-        phone: form.phone,
-        subject: `${form.from} → ${form.to}`,
-        message: `Trip: ${form.tripType}, Date: ${form.date}, Pax: ${form.pax}`,
-        meta: { from: form.from, to: form.to, tripType: form.tripType, date: form.date, pax: form.pax },
-      });
-      toast.success(t("form.inquirySent"));
-      setForm({ from: "", to: "", tripType: "round-trip", date: "", pax: 1, name: "", phone: "" });
-    } catch {
-      toast.error("Something went wrong.");
-    }
-  };
+  // Dropdown options come ONLY from the admin-created air-ticket packages.
+  const froms = useMemo(() => [...new Set(fares.map((x) => x.from).filter(Boolean))].sort(), [fares]);
+  const tos = useMemo(
+    () => [...new Set(fares.filter((x) => !filter.from || x.from === filter.from).map((x) => x.to).filter(Boolean))].sort(),
+    [fares, filter.from]
+  );
+
+  const matched = fares.filter((f) => {
+    const okFrom = !filter.from || norm(f.from).includes(norm(filter.from)) || norm(filter.from).includes(norm(f.from));
+    const okTo = !filter.to || norm(f.to).includes(norm(filter.to)) || norm(filter.to).includes(norm(f.to));
+    return okFrom && okTo;
+  });
+  const searching = Boolean(filter.from || filter.to);
 
   return (
     <Container>
-      {/* Search / quote form */}
-      <div className="mt-10 rounded-2xl bg-white p-6 shadow-[var(--shadow-card)] ring-1 ring-slate-200">
-        <h2 className="mb-4 text-xl font-bold text-ink">
-          {lang === "bn" ? "ফ্লাইট কোটেশন নিন" : "Get a Flight Quote"}
-        </h2>
-        <form onSubmit={submit} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Input label={lang === "bn" ? "কোথা থেকে" : "From"} placeholder="Dhaka (DAC)" value={form.from} onChange={set("from")} required />
-          <Input label={lang === "bn" ? "কোথায়" : "To"} placeholder="Dubai (DXB)" value={form.to} onChange={set("to")} required />
-          <Select label={lang === "bn" ? "ট্রিপ" : "Trip type"} value={form.tripType} onChange={set("tripType")}>
-            <option value="round-trip">Round-trip</option>
-            <option value="one-way">One-way</option>
-            <option value="multi-city">Multi-city</option>
-          </Select>
-          <Input type="date" label={t("form.travelDate")} value={form.date} onChange={set("date")} />
-          <Input type="number" min="1" label={lang === "bn" ? "যাত্রী" : "Passengers"} value={form.pax} onChange={set("pax")} />
-          <Input label={t("form.phone")} placeholder="01XXXXXXXXX" value={form.phone} onChange={set("phone")} required />
-          <div className="sm:col-span-2 lg:col-span-3">
-            <Button type="submit" disabled={isPending}>
-              {isPending ? <><Spinner /> {t("common.sending")}</> : <>✈️ {lang === "bn" ? "কোটেশন চাই" : "Request Quote"}</>}
-            </Button>
+      {/* Search bar */}
+      <div className="mt-10 rounded-2xl bg-white p-5 shadow-xl ring-1 ring-slate-200">
+        <h2 className="mb-4 text-lg font-bold text-ink">{lang === "bn" ? "ফ্লাইট খুঁজুন" : "Find Your Flight"}</h2>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto_auto]">
+          {/* From & To — dropdowns from the admin's air-ticket packages */}
+          <div className="rounded-xl border border-slate-200 px-4 py-2 focus-within:border-brand">
+            <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{lang === "bn" ? "কোথা থেকে" : "From"}</span>
+            <select className="mt-0.5 w-full bg-transparent text-sm font-bold text-ink outline-none" value={filter.from} onChange={(e) => setFilter((s) => ({ ...s, from: e.target.value, to: "" }))}>
+              <option value="">{lang === "bn" ? "নির্বাচন করুন" : "Select origin"}</option>
+              {froms.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
-        </form>
+          <div className="rounded-xl border border-slate-200 px-4 py-2 focus-within:border-brand">
+            <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{lang === "bn" ? "কোথায়" : "To"}</span>
+            <select className="mt-0.5 w-full bg-transparent text-sm font-bold text-ink outline-none disabled:text-slate-400" value={filter.to} onChange={set("to")} disabled={!filter.from}>
+              <option value="">{filter.from ? (lang === "bn" ? "গন্তব্য নির্বাচন" : "Select destination") : (lang === "bn" ? "আগে From নির্বাচন" : "Pick origin first")}</option>
+              {tos.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          {/* Date — free */}
+          <div className="rounded-xl border border-slate-200 px-4 py-2 focus-within:border-brand">
+            <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{lang === "bn" ? "তারিখ" : "Date"}</span>
+            <input type="date" className="mt-0.5 w-full bg-transparent text-sm font-bold text-ink outline-none" value={filter.date} onChange={set("date")} />
+          </div>
+          {/* Class — free */}
+          <div className="rounded-xl border border-slate-200 px-4 py-2 focus-within:border-brand">
+            <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{lang === "bn" ? "ক্লাস" : "Class"}</span>
+            <select className="mt-0.5 w-full bg-transparent text-sm font-bold text-ink outline-none" value={filter.cls} onChange={set("cls")}>
+              <option>Economy</option><option>Business</option><option>First</option>
+            </select>
+          </div>
+          <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-8 py-3 text-base font-bold text-brand-dark shadow-lg transition hover:bg-accent-dark">
+            <Icon name="search" className="h-5 w-5" /> {lang === "bn" ? "খুঁজুন" : "Search"}
+          </button>
+        </div>
       </div>
 
-      {/* Featured fares */}
+      {/* Fares */}
       <section className="py-14">
-        <SectionHeading title={lang === "bn" ? "জনপ্রিয় ভাড়া" : "Popular Fares"} />
+        <SectionHeading title={searching ? (lang === "bn" ? "ম্যাচিং ফ্লাইট" : "Matching Flights") : (lang === "bn" ? "জনপ্রিয় ভাড়া" : "Popular Fares")} />
         <div className="mt-10">
-          {!fares.length ? (
+          {isLoading ? (
             <SkeletonGrid count={4} />
+          ) : matched.length ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {matched.map((f) => <FareCard key={f._id} item={f} />)}
+            </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {fares.map((f) => (
-                <div key={f._id} className="card-base overflow-hidden shadow-[var(--shadow-card)]">
-                  <div className="relative h-32">
-                    {f.cover && <Image src={f.cover} alt={f.to} fill sizes="25vw" className="object-cover" />}
-                    <Badge tone="accent" className="absolute right-2 top-2">{f.tripType}</Badge>
-                  </div>
-                  <div className="p-4">
-                    <p className="font-bold text-ink">{f.from} → {f.to}</p>
-                    <p className="text-sm text-muted">{f.airline}</p>
-                    <p className="mt-2 text-lg font-extrabold text-accent-dark">{priceLabel(f.price)}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="rounded-2xl bg-surface py-16 text-center">
+              <p className="text-muted">{lang === "bn" ? "এই রুটে এখন কোনো ফেয়ার নেই — আমাদের সাথে যোগাযোগ করুন, আমরা সেরা দাম এনে দেব।" : "No fares for this route yet — contact us and we'll find you the best price."}</p>
+              <a href="/contact" className="mt-4 inline-block rounded-lg bg-brand px-6 py-2.5 font-semibold text-white transition hover:bg-brand-dark">{t("common.inquireNow")}</a>
             </div>
           )}
         </div>

@@ -56,10 +56,10 @@ export default function SettingsAdminPage() {
   );
 
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="w-full">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-ink">Site Settings</h1>
-        <Button onClick={save} disabled={saving}>{saving ? <><Spinner /> Saving…</> : "Save changes"}</Button>
+        <p className="text-sm text-muted">Update your site identity, contact details, social links and SEO.</p>
       </div>
 
       <div className="space-y-6">
@@ -99,6 +99,13 @@ export default function SettingsAdminPage() {
           <Textarea label="Meta description" rows={2} value={s.seo?.description || ""} onChange={(e) => setIn(["seo", "description"], e.target.value)} />
           <Input label="Keywords" value={s.seo?.keywords || ""} onChange={(e) => setIn(["seo", "keywords"], e.target.value)} />
         </Section>
+
+        {/* Save — at the bottom, full-width bar */}
+        <div className="flex justify-end border-t border-slate-200 pt-5">
+          <Button onClick={save} size="lg" disabled={saving}>
+            {saving ? <><Spinner /> Saving…</> : "Save changes"}
+          </Button>
+        </div>
       </div>
     </div>
   );

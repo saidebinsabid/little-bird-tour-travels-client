@@ -1,12 +1,21 @@
 import "./globals.css";
-import { Inter, Hind_Siliguri } from "next/font/google";
+import { Montserrat, Teko, Hind_Siliguri } from "next/font/google";
 import Providers from "@/provider/Providers";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 
-// Latin UI font + dedicated Bengali font, exposed as CSS variables used by
-// globals.css (--font-inter / --font-bangla).
-const inter = Inter({
+// Sitewide font (Montserrat), a condensed display font kept ONLY for the hero
+// title (Teko, via the .font-display class), and a dedicated Bengali font — all
+// exposed as CSS variables used by globals.css.
+const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-montserrat",
+  display: "swap",
+});
+const teko = Teko({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
   display: "swap",
 });
 const hindSiliguri = Hind_Siliguri({
@@ -34,8 +43,9 @@ export const metadata = {
 // Root layout wraps EVERY page. Fonts, <html>, and the Providers tree go here.
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${hindSiliguri.variable}`}>
+    <html lang="en" className={`${montserrat.variable} ${teko.variable} ${hindSiliguri.variable}`}>
       <body>
+        <LoadingScreen />
         <Providers>{children}</Providers>
       </body>
     </html>

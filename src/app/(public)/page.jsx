@@ -2,11 +2,9 @@
 import Hero from "@/components/home/Hero";
 import ServicesGrid from "@/components/home/ServicesGrid";
 import FeaturedPackages from "@/components/home/FeaturedPackages";
-import PopularDestinations from "@/components/home/PopularDestinations";
-import HajjPromo from "@/components/home/HajjPromo";
+import AboutSection from "@/components/home/AboutSection";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
 import Testimonials from "@/components/home/Testimonials";
-import TravelTips from "@/components/home/TravelTips";
 import CTA from "@/components/home/CTA";
 
 export default function HomePage() {
@@ -15,11 +13,9 @@ export default function HomePage() {
       <Hero />
       <ServicesGrid />
       <FeaturedPackages />
-      <PopularDestinations />
-      <HajjPromo />
+      <AboutSection />
       <WhyChooseUs />
       <Testimonials />
-      <TravelTips />
       <CTA />
     </>
   );

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/firebase/config";
@@ -23,6 +24,7 @@ export function useAuthContext() {
 
 export default function AuthProvider({ children }) {
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const hydrate = useCallback(
     (user) => {
@@ -77,6 +79,8 @@ export default function AuthProvider({ children }) {
     } finally {
       dispatch(clearAuth());
       dispatch(setLoading(false));
+      // Signing out yourself → go to the home page.
+      router.push("/");
     }
   };
 

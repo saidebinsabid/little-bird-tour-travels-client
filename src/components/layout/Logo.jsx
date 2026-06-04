@@ -5,12 +5,11 @@ import { useSettings } from "@/hooks/useContent";
 import websiteLogo from "@/assets/website-logo.png";
 
 /**
- * Sitewide logo. Uses the bundled brand logo (src/assets/website-logo.png) by
- * default; an uploaded logo in Site Settings (Cloudinary) overrides it.
- *
- * props:
- *   light — over a dark/transparent background → logo sits in a white chip so
- *           it stays crisp.
+ * Sitewide logo.
+ *   light = true  → over a dark/transparent background (hero navbar, footer):
+ *                   sits in a soft white rounded chip so it stays crisp.
+ *   light = false → over a solid white background (scrolled navbar, dashboard):
+ *                   no chip — the logo reads as if it's directly on the bar.
  */
 export default function Logo({ light = false, onClick, className = "" }) {
   const { data: settings } = useSettings();
@@ -18,9 +17,9 @@ export default function Logo({ light = false, onClick, className = "" }) {
 
   return (
     <Link href="/" onClick={onClick} className={`flex shrink-0 items-center ${className}`}>
-      <span className={light ? "rounded-xl bg-white/95 px-2 py-1 shadow-sm" : ""}>
+      <span className={light ? "rounded-2xl bg-white p-1.5 shadow-sm" : ""}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt="Little Bird Travels" className="h-10 w-auto md:h-12" />
+        <img src={src} alt="Little Bird Travels" className="h-12 w-auto md:h-14" />
       </span>
     </Link>
   );

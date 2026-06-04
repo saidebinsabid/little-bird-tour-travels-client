@@ -1,13 +1,19 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import ResourceManager from "@/components/admin/ResourceManager";
+import ResourceTable from "@/components/admin/ResourceTable";
+import ResourceCards from "@/components/admin/ResourceCards";
 import { resources } from "@/admin/resources";
 
 export default function AdminResourcePage() {
   const { resource } = useParams();
-  if (!resources[resource]) {
+  const cfg = resources[resource];
+  if (!cfg) {
     return <div className="text-muted">Unknown resource: {resource}</div>;
   }
-  return <ResourceManager resourceKey={resource} />;
+  return cfg.cardView ? (
+    <ResourceCards resourceKey={resource} />
+  ) : (
+    <ResourceTable resourceKey={resource} />
+  );
 }

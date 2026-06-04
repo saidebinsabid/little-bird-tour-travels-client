@@ -4,79 +4,80 @@ import Link from "next/link";
 import Image from "next/image";
 import { useI18n } from "@/i18n/useI18n";
 import { priceLabel } from "@/utils/format";
-import Badge from "@/components/ui/Badge";
-import Rating from "@/components/ui/Rating";
+import Icon from "@/components/icons/Icon";
 
-// Reused on the home page and the /packages grid. `basePath` lets the same card
-// link into different sections (packages, hajj-umrah, hotels...).
-export default function PackageCard({ item, basePath = "/packages" }) {
-  const { t, pick, lang } = useI18n();
-  const href = `${basePath}/${item.slug || item._id}`;
+// Overlay-style tour-package card: the cover image fills the card, and every
+// piece of information is stacked top-to-bottom inside a frosted dark box pinned
+// to the bottom — meta (location · duration) → title → price + a circular CTA
+// arrow. Pass `href` to override the link target and `actions` to drop controls
+// (e.g. admin edit/delete) into the top-right corner.
+export default function PackageCard({ item, basePath = "/packages", href: hrefProp, actions }) {
+  const { pick, lang } = useI18n();
+  const href = hrefProp || `${basePath}/${item.slug || item._id}`;
+  const title = pick(item.title) || pick(item.name);
   const durLabel =
     item.durationDays || item.durationNights
       ? lang === "bn"
-        ? `${item.durationDays || 0} দিন / ${item.durationNights || 0} রাত`
-        : `${item.durationDays || 0}D / ${item.durationNights || 0}N`
+        ? `${item.durationDays || 0} দিন ${item.durationNights || 0} রাত`
+        : `${item.durationDays || 0} Days ${item.durationNights || 0} Night`
       : null;
-  const unitLabel =
-    item.price?.unit === "per couple"
-      ? t("common.perCouple")
-      : item.price?.unit === "per night"
-        ? t("common.perNight")
-        : t("common.perPerson");
 
   return (
-    <article className="card-base group flex flex-col shadow-[var(--shadow-card)] transition hover:-translate-y-1">
-      <Link href={href} className="relative block h-52 overflow-hidden">
-        {item.cover ? (
-          <Image
-            src={item.cover}
-            alt={pick(item.title) || pick(item.name)}
-            fill
-            sizes="(max-width:768px) 100vw, 33vw"
-            className="object-cover transition duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="h-full w-full bg-slate-200" />
-        )}
-        {item.featured && (
-          <Badge tone="accent" className="absolute left-3 top-3">★ Featured</Badge>
-        )}
-        {durLabel && (
-          <span className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white">
-            {durLabel}
-          </span>
-        )}
-      </Link>
+    <article className="group relative h-[440px] overflow-hidden rounded-3xl shadow-[var(--shadow-card)] ring-1 ring-slate-200/70 transition hover:-translate-y-1 hover:shadow-2xl">
+      {item.cover ? (
+        <Image
+          src={item.cover}
+          alt={title}
+          fill
+          sizes="(max-width:768px) 100vw, 33vw"
+          className="object-cover transition duration-700 group-hover:scale-105"
+        />
+      ) : (
+        <div className="h-full w-full bg-slate-200" />
+      )}
 
-      <div className="flex flex-1 flex-col p-4">
-        {item.location && (
-          <p className="text-xs font-medium text-muted">📍 {pick(item.location)}</p>
-        )}
-        <h3 className="mt-1 line-clamp-2 clamp-2 text-base font-bold text-ink">
-          <Link href={href} className="hover:text-brand">{pick(item.title) || pick(item.name)}</Link>
-        </h3>
-        {item.summary && (
-          <p className="mt-1.5 text-sm text-body clamp-2">{pick(item.summary)}</p>
-        )}
+      {/* Legibility gradient so the bottom text always reads */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
-        <div className="mt-3 flex items-center gap-2">
-          {item.rating ? <Rating value={item.rating} /> : null}
-          {item.rating ? <span className="text-xs text-muted">{item.rating.toFixed(1)}</span> : null}
+      {/* Whole-card link (sits under the content; action buttons override it) */}
+      <Link href={href} className="absolute inset-0 z-0" aria-label={title} />
+
+      {item.featured && (
+        <span className="pointer-events-none absolute left-4 top-4 z-10 inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1 text-xs font-bold text-brand-dark shadow">
+          ★ {lang === "bn" ? "ফিচার্ড" : "Featured"}
+        </span>
+      )}
+
+      {/* Optional controls (admin edit/delete) — above the link so they're clickable */}
+      {actions && <div className="absolute right-4 top-4 z-20 flex items-center gap-2">{actions}</div>}
+
+      {/* Info box pinned to the bottom */}
+      <div className="pointer-events-none absolute inset-x-4 bottom-4 z-10 rounded-2xl border border-white/15 bg-black/40 p-5 backdrop-blur-md transition group-hover:bg-black/55">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-white/85">
+          {item.location && (
+            <span className="flex items-center gap-1.5">
+              <Icon name="pin" className="h-4 w-4 text-accent" /> {pick(item.location)}
+            </span>
+          )}
+          {durLabel && (
+            <span className="flex items-center gap-1.5">
+              <Icon name="clock" className="h-4 w-4 text-accent" /> {durLabel}
+            </span>
+          )}
         </div>
 
-        <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-3">
+        <h3 className="clamp-2 mt-2 text-lg font-bold leading-snug text-white">{title}</h3>
+
+        <div className="mt-3 flex items-end justify-between gap-3 border-t border-white/15 pt-3">
           <div>
-            <span className="block text-xs text-muted">{t("common.from")}</span>
-            <span className="text-lg font-extrabold text-accent-dark">{priceLabel(item.price)}</span>
-            <span className="ml-1 text-xs text-muted">{unitLabel}</span>
+            <span className="block text-[11px] uppercase tracking-wide text-white/65">
+              {lang === "bn" ? "শুরু" : "Start From"}
+            </span>
+            <span className="text-2xl font-extrabold text-white">{priceLabel(item.price)}</span>
           </div>
-          <Link
-            href={href}
-            className="rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark"
-          >
-            {t("common.viewDetails")}
-          </Link>
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent text-brand-dark shadow-lg transition group-hover:scale-110 group-hover:bg-accent-dark">
+            <Icon name="arrowUpRight" className="h-5 w-5" />
+          </span>
         </div>
       </div>
     </article>

@@ -26,7 +26,7 @@ export default function ServicesGrid() {
             <Link
               key={s.titleKey}
               href={s.href}
-              className="card-base group flex items-start gap-4 p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1 hover:ring-brand"
+              className="card-base running-border group flex items-start gap-4 p-6 shadow-[var(--shadow-card)] transition"
             >
               <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-brand-light text-brand transition group-hover:bg-brand group-hover:text-white">
                 <Icon name={s.icon} className="h-7 w-7" />

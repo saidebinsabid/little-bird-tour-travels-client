@@ -28,9 +28,6 @@ export default function Footer() {
   const discover = [
     { href: "/", key: "nav.home" },
     { href: "/about", key: "nav.about" },
-    { href: "/destinations", key: "nav.destinations" },
-    { href: "/blog", key: "nav.blog" },
-    { href: "/faq", key: "nav.faq" },
     { href: "/terms", label: "Terms" },
     { href: "/privacy", label: "Privacy" },
   ];

@@ -14,7 +14,11 @@
   --color-line: #e2e8f0; /* slate-200 — borders */
   --color-surface: #f8fafc; /* slate-50 — section bg */
 
-  --font-sans: var(--font-inter), "Hind Siliguri", system-ui, sans-serif;
+  /* Montserrat (--font-montserrat) is the sitewide font; Bengali script falls
+     back to the Bangla font since Montserrat has no Bengali glyphs. The hero
+     title keeps Teko via the .font-display class below. */
+  --font-sans: var(--font-montserrat), var(--font-bangla), "Hind Siliguri", system-ui, sans-serif;
+  --font-heading: var(--font-montserrat), var(--font-bangla), "Hind Siliguri", system-ui, sans-serif;
   --font-bangla: var(--font-bangla), "Hind Siliguri", system-ui, sans-serif;
 
   --shadow-card: 0 1px 3px rgb(15 23 42 / 0.08), 0 8px 24px rgb(15 23 42 / 0.06);
@@ -25,15 +29,20 @@
   --foreground: #334155;
 }
 
-* {
-  border-color: var(--color-line);
+/* Default border color (slate-200) for bare `border` utilities.
+   Must live in @layer base so explicit `border-{color}` utilities
+   (e.g. border-brand) still win — an unlayered rule would override them. */
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), "Hind Siliguri", system-ui, -apple-system,
-    "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-montserrat), var(--font-bangla), "Hind Siliguri", system-ui,
+    -apple-system, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -43,10 +52,49 @@ body {
   font-family: var(--font-bangla), "Hind Siliguri", system-ui, sans-serif;
 }
 
-h1, h2, h3, h4 {
-  color: var(--color-ink);
-  font-weight: 700;
-  line-height: 1.2;
+/* Never let users drag-resize any textarea, sitewide. */
+textarea {
+  resize: none;
+}
+
+/* Base heading styles live in @layer base so Tailwind text-color/font
+   utilities (e.g. text-white, font-display) always override them. */
+@layer base {
+  h1, h2, h3, h4 {
+    color: var(--color-ink);
+    font-family: var(--font-montserrat), var(--font-bangla), "Hind Siliguri", system-ui, sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  :lang(bn) h1, :lang(bn) h2, :lang(bn) h3, :lang(bn) h4 {
+    font-family: var(--font-bangla);
+  }
+}
+
+/* Condensed "Teko" display font for hero headlines (Bengali falls back). */
+.font-display {
+  font-family: var(--font-display), var(--font-bangla), sans-serif;
+  letter-spacing: 0;
+}
+
+/* White text with a navy stroke + soft shadow — stays sharp on a clear
+   (un-dimmed) banner image. */
+.text-outline {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-text-stroke: 1.5px var(--color-brand-dark);
+  paint-order: stroke fill;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+/* Animated hero word — golden fill with a navy edge + glow (blue + yellow combo)
+   so the rotating word stays vivid and legible over the busy banner photo. */
+.hero-word {
+  color: var(--color-accent);
+  -webkit-text-fill-color: var(--color-accent);
+  -webkit-text-stroke: 1px var(--color-brand-dark);
+  paint-order: stroke fill;
+  text-shadow: 0 2px 10px rgba(13, 24, 87, 0.7), 0 1px 3px rgba(0, 0, 0, 0.55);
 }
 
 /* ── Small reusable component classes ─────────────────────────────────────
@@ -76,3 +124,56 @@ h1, h2, h3, h4 {
 /* Line clamp helpers */
 .clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.clamp-4 { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Hero entrance + rotating-word animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-fade-up { animation: fadeUp 0.8s ease-out both; }
+.animate-fade-word { animation: fadeUp 0.5s ease-out both; }
+
+/* ── Running border beam (on hover) ───────────────────────────────────────
+   A blue light starts on one edge and travels around all four sides of the
+   card border. We rotate a conic-gradient via the animatable --beam-angle, then
+   mask out everything but a thin ring so only the border shows (content stays
+   untouched — no shadow, no full border). */
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes beam-spin {
+  to { --beam-angle: 360deg; }
+}
+.running-border { position: relative; }
+.running-border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+  padding: 2px; /* border thickness */
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0deg,
+    transparent 235deg,
+    #3b82f6 300deg,
+    #93c5fd 332deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.running-border:hover::after {
+  opacity: 1;
+  animation: beam-spin 2.2s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .running-border:hover::after { animation: none; }
+}

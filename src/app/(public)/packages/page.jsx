@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import PageHeader from "@/components/layout/PageHeader";
 import PackagesBrowser from "@/components/packages/PackagesBrowser";
+import PageSearchBar from "@/components/search/PageSearchBar";
+import TourSearch from "@/components/search/TourSearch";
 import { PageLoader } from "@/components/ui/Loading";
 
 export const metadata = { title: "Tour Packages" };
@@ -14,8 +16,11 @@ export default function PackagesPage() {
         crumbs={[{ label: "Tour Packages" }]}
         bg="https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=2000&q=80"
       />
+      <PageSearchBar>
+        <TourSearch />
+      </PageSearchBar>
       <Suspense fallback={<PageLoader />}>
-        <PackagesBrowser />
+        <PackagesBrowser showSidebar={false} />
       </Suspense>
     </>
   );

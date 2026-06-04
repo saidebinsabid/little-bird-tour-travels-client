@@ -1,23 +1,33 @@
 "use client";
 
+import Container from "@/components/ui/Container";
 import SearchWidget from "./SearchWidget";
+import AnimatedHeroText from "./AnimatedHeroText";
+import bannerImage from "@/assets/banner-image.jpg";
 
 export default function Hero() {
   return (
-    <section className="relative isolate overflow-hidden">
-      {/* Bright sky + ocean background */}
-      <div
-        className="absolute inset-0 -z-10 bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80')",
-        }}
-      />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/15 via-transparent to-white/25" />
+    <section className="relative bg-white">
+      {/* Banner with the animated heading in the middle */}
+      <div className="relative isolate overflow-hidden">
+        {/* The banner photo has a soft white vignette baked into its edges, so we
+            zoom it slightly — the parent's overflow-hidden crops the white corners. */}
+        <div
+          className="absolute inset-0 -z-10 scale-[1.22] bg-cover bg-center"
+          style={{ backgroundImage: `url('${bannerImage.src}')` }}
+        />
 
-      <div className="container-x pt-36 pb-28 md:pt-44 md:pb-44">
-        <SearchWidget />
+        <div className="container-x flex min-h-[78vh] flex-col items-center justify-center pt-24 pb-44 md:pb-52">
+          <AnimatedHeroText />
+        </div>
       </div>
+
+      {/* Search widget — pulled up so it sits half on the banner, half below */}
+      <Container>
+        <div className="relative z-10 -mt-36 md:-mt-44">
+          <SearchWidget />
+        </div>
+      </Container>
     </section>
   );
 }

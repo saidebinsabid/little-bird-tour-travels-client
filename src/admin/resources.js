@@ -8,6 +8,7 @@ export const resources = {
   packages: {
     label: "Tour Packages",
     endpoint: "packages",
+    cardView: true, // render the admin list as package cards instead of a table
     listColumns: ["title", "type", "price", "status"],
     fields: [
       { name: "title", type: "i18n", label: "Title", required: true },
@@ -29,21 +30,6 @@ export const resources = {
     ],
   },
 
-  destinations: {
-    label: "Destinations",
-    endpoint: "destinations",
-    listColumns: ["name", "country", "popular", "status"],
-    fields: [
-      { name: "name", type: "i18n", label: "Name", required: true },
-      { name: "country", type: "text", label: "Country" },
-      { name: "region", type: "select", label: "Region", options: ["domestic", "international"] },
-      { name: "description", type: "i18n", label: "Description" },
-      { name: "image", type: "image", label: "Image" },
-      { name: "popular", type: "boolean", label: "Popular" },
-      { name: "status", type: "select", label: "Status", options: STATUS },
-    ],
-  },
-
   hajj: {
     label: "Hajj & Umrah",
     endpoint: "hajj",
@@ -58,7 +44,8 @@ export const resources = {
       { name: "hotelMakkah", type: "i18n", label: "Makkah hotel" },
       { name: "hotelMadinah", type: "i18n", label: "Madinah hotel" },
       { name: "status", type: "select", label: "Status", options: STATUS },
-      { name: "inclusions", type: "json", label: "Inclusions — { en: [], bn: [] }" },
+      { name: "inclusions", type: "json", label: "Inclusions (What's Included) — { en: [], bn: [] }" },
+      { name: "exclusions", type: "json", label: "Exclusions (What's Not Included) — { en: [], bn: [] }" },
       { name: "documents", type: "json", label: "Documents — { en: [], bn: [] }" },
     ],
   },
@@ -66,6 +53,7 @@ export const resources = {
   visas: {
     label: "Visa Services",
     endpoint: "visas",
+    cardView: true, // show the public visa cards (+ edit/delete) instead of a table
     listColumns: ["title", "country", "visaType", "status"],
     fields: [
       { name: "title", type: "i18n", label: "Title", required: true },
@@ -82,6 +70,7 @@ export const resources = {
   hotels: {
     label: "Hotels",
     endpoint: "hotels",
+    cardView: true, // show the public hotel cards (+ edit/delete) instead of a table
     listColumns: ["name", "city", "rating", "price", "status"],
     fields: [
       { name: "name", type: "i18n", label: "Name", required: true },
@@ -98,6 +87,7 @@ export const resources = {
   "air-tickets": {
     label: "Air-ticket Fares",
     endpoint: "air-tickets",
+    cardView: true, // show the public fare cards (+ edit/delete) instead of a table
     listColumns: ["from", "to", "airline", "price", "status"],
     fields: [
       { name: "from", type: "text", label: "From", required: true },
@@ -110,46 +100,14 @@ export const resources = {
     ],
   },
 
-  blogs: {
-    label: "Blog Posts",
-    endpoint: "blogs",
-    listColumns: ["title", "category", "status"],
-    fields: [
-      { name: "title", type: "i18n", label: "Title", required: true },
-      { name: "category", type: "text", label: "Category" },
-      { name: "cover", type: "image", label: "Cover image" },
-      { name: "excerpt", type: "i18n", label: "Excerpt" },
-      { name: "content", type: "i18n", label: "Content", textarea: true },
-      { name: "status", type: "select", label: "Status", options: STATUS },
-      { name: "tags", type: "json", label: "Tags — array of strings" },
-    ],
-  },
-
-  banners: {
-    label: "Home Banners",
-    endpoint: "banners",
-    listColumns: ["title", "position", "active"],
-    fields: [
-      { name: "title", type: "i18n", label: "Title", required: true },
-      { name: "subtitle", type: "i18n", label: "Subtitle" },
-      { name: "image", type: "image", label: "Image" },
-      { name: "link", type: "text", label: "Link (e.g. /packages)" },
-      { name: "position", type: "select", label: "Position", options: ["hero"] },
-      { name: "order", type: "number", label: "Order" },
-      { name: "active", type: "boolean", label: "Active" },
-    ],
-  },
 };
 
 const RESOURCE_ICONS = {
   packages: "tour",
-  destinations: "pin",
   hajj: "hajj",
   visas: "visa",
   hotels: "hotel",
   "air-tickets": "flight",
-  blogs: "blog",
-  banners: "image",
 };
 
 export const resourceList = Object.entries(resources).map(([key, v]) => ({
