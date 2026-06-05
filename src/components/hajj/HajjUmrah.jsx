@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Container from "@/components/ui/Container";
 import Icon from "@/components/icons/Icon";
 import { SkeletonGrid } from "@/components/ui/Loading";
+import Pagination from "@/components/ui/Pagination";
 import { useI18n } from "@/i18n/useI18n";
 import { useContentList } from "@/hooks/useContent";
 import { priceLabel } from "@/utils/format";
@@ -73,8 +74,11 @@ function HajjCard({ item }) {
 export default function HajjUmrah() {
   const { t, lang } = useI18n();
   const [tab, setTab] = useState("hajj");
-  const { data, isLoading } = useContentList("hajj", { status: "published", type: tab, limit: 12 });
+  const [page, setPage] = useState(1);
+  useEffect(() => { setPage(1); }, [tab]);
+  const { data, isLoading } = useContentList("hajj", { status: "published", type: tab, limit: 12, page });
   const items = data?.data || [];
+  const totalPages = data?.pagination?.pages || 1;
 
   return (
     <Container>
@@ -97,9 +101,12 @@ export default function HajjUmrah() {
         {isLoading ? (
           <SkeletonGrid count={3} />
         ) : items.length ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {items.map((p) => <HajjCard key={p._id} item={p} />)}
-          </div>
+          <>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {items.map((p) => <HajjCard key={p._id} item={p} />)}
+            </div>
+            <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+          </>
         ) : (
           <div className="rounded-2xl bg-surface py-20 text-center text-muted">{t("common.noResults")}</div>
         )}

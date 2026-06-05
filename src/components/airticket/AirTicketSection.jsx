@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useI18n } from "@/i18n/useI18n";
 import { useContentList } from "@/hooks/useContent";
@@ -9,8 +9,10 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import Icon from "@/components/icons/Icon";
 import FareCard from "./FareCard";
 import { SkeletonGrid } from "@/components/ui/Loading";
+import Pagination from "@/components/ui/Pagination";
 
 const norm = (s = "") => s.toLowerCase().replace(/\(.*?\)/g, "").trim();
+const PER_PAGE = 12;
 
 export default function AirTicketSection() {
   const { t, lang } = useI18n();
@@ -39,6 +41,12 @@ export default function AirTicketSection() {
     return okFrom && okTo;
   });
   const searching = Boolean(filter.from || filter.to);
+
+  // Client-side pagination over the filtered fares
+  const [page, setPage] = useState(1);
+  useEffect(() => { setPage(1); }, [filter.from, filter.to]);
+  const totalPages = Math.ceil(matched.length / PER_PAGE) || 1;
+  const visible = matched.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   return (
     <Container>
@@ -86,9 +94,12 @@ export default function AirTicketSection() {
           {isLoading ? (
             <SkeletonGrid count={4} />
           ) : matched.length ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {matched.map((f) => <FareCard key={f._id} item={f} />)}
-            </div>
+            <>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {visible.map((f) => <FareCard key={f._id} item={f} />)}
+              </div>
+              <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+            </>
           ) : (
             <div className="rounded-2xl bg-surface py-16 text-center">
               <p className="text-muted">{lang === "bn" ? "এই রুটে এখন কোনো ফেয়ার নেই — আমাদের সাথে যোগাযোগ করুন, আমরা সেরা দাম এনে দেব।" : "No fares for this route yet — contact us and we'll find you the best price."}</p>

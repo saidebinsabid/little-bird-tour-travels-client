@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +12,9 @@ import PackageCard from "@/components/packages/PackageCard";
 import VisaCard from "@/components/visa/VisaCard";
 import FareCard from "@/components/airticket/FareCard";
 import { PageLoader } from "@/components/ui/Loading";
+import Pagination from "@/components/ui/Pagination";
+
+const PER_PAGE = 12;
 
 // The public-facing card for each resource, so admins see exactly what users see.
 const CARD_BY_RESOURCE = {
@@ -33,8 +37,13 @@ export default function ResourceCards({ resourceKey }) {
     queryFn: async () => (await axiosSecure.get(`/${cfg.endpoint}`, { params: { limit: 100 } })).data,
   });
 
+  const [page, setPage] = useState(1);
+  useEffect(() => { setPage(1); }, [resourceKey]);
+
   if (!cfg) return <div className="text-muted">Unknown resource.</div>;
   const rows = data?.data || [];
+  const totalPages = Math.ceil(rows.length / PER_PAGE) || 1;
+  const visible = rows.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const remove = async (item) => {
     if (!confirm("Are you sure you want to delete this? This action cannot be undone.")) return;
@@ -63,8 +72,9 @@ export default function ResourceCards({ resourceKey }) {
       {isLoading ? (
         <PageLoader />
       ) : rows.length ? (
+        <>
         <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {rows.map((item) => (
+          {visible.map((item) => (
             <Card
               key={item._id}
               item={item}
@@ -93,6 +103,8 @@ export default function ResourceCards({ resourceKey }) {
             />
           ))}
         </div>
+        <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+        </>
       ) : (
         <div className="mt-6 rounded-2xl bg-surface py-20 text-center text-muted">
           No items yet — click “Add New”.

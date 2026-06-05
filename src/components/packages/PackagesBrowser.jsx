@@ -9,6 +9,7 @@ import Container from "@/components/ui/Container";
 import { Input, Select } from "@/components/ui/Field";
 import { SkeletonGrid } from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
+import Pagination from "@/components/ui/Pagination";
 
 const TYPES = ["domestic", "international", "honeymoon", "family", "adventure", "group", "corporate"];
 
@@ -84,21 +85,13 @@ export default function PackagesBrowser({
         <div className="rounded-2xl bg-surface py-20 text-center text-muted">{t("common.noResults")}</div>
       )}
 
-      {/* Pagination (server pagination is bypassed when a price is filtered client-side) */}
-      {pages > 1 && !priceParam && (
-        <div className="mt-10 flex justify-center gap-2">
-          {Array.from({ length: pages }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setFilters((f) => ({ ...f, page: i + 1 }))}
-              className={`h-10 w-10 rounded-lg text-sm font-semibold transition ${
-                filters.page === i + 1 ? "bg-brand text-white" : "bg-white ring-1 ring-slate-200 hover:ring-brand"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-        </div>
+      {/* Pagination (bypassed when a price is filtered client-side) */}
+      {!priceParam && (
+        <Pagination
+          page={filters.page}
+          totalPages={pages}
+          onChange={(p) => setFilters((f) => ({ ...f, page: p }))}
+        />
       )}
     </div>
   );
