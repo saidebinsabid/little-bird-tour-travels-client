@@ -9,10 +9,10 @@ import TourSearch from "@/components/search/TourSearch";
 import VisaSearch from "@/components/search/VisaSearch";
 
 const TABS = [
+  { key: "visa", icon: "visa", labelKey: "nav.visa" },
   { key: "flight", icon: "flight", labelKey: "nav.airTicket" },
   { key: "hotel", icon: "hotel", labelKey: "nav.hotels" },
   { key: "tour", icon: "tour", labelKey: "nav.packages" },
-  { key: "visa", icon: "visa", labelKey: "nav.visa" },
 ];
 
 function Cell({ label, children, className = "" }) {
@@ -117,7 +117,7 @@ function HotelForm() {
 
 export default function SearchWidget() {
   const { t } = useI18n();
-  const [tab, setTab] = useState("flight");
+  const [tab, setTab] = useState("visa");
 
   return (
     <div className="mx-auto w-full max-w-5xl rounded-2xl bg-white p-4 shadow-2xl sm:p-5">

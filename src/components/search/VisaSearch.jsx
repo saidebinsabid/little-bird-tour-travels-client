@@ -8,7 +8,9 @@ import Icon from "@/components/icons/Icon";
 
 // Visa search: From country → To (destination) country → Visa type →
 // routes to /visa filtered by destination country + type.
-const FROM_COUNTRIES = ["Bangladesh", "India", "Pakistan", "Nepal", "Sri Lanka", "Maldives"];
+// Origin is fixed to Bangladesh (our travellers); destinations are every other
+// country we offer visas for.
+const FROM_COUNTRIES = ["Bangladesh"];
 
 function Field({ label, children }) {
   return (
@@ -26,7 +28,12 @@ export default function VisaSearch() {
   const { data } = useContentList("visas", { status: "published", limit: 100 });
   const visas = data?.data || [];
 
-  const toCountries = useMemo(() => [...new Set(visas.map((v) => v.country).filter(Boolean))].sort(), [visas]);
+  const toCountries = useMemo(
+    () => [...new Set(visas.map((v) => v.country).filter(Boolean))]
+      .filter((c) => c.toLowerCase() !== "bangladesh")
+      .sort(),
+    [visas]
+  );
   const typeOptions = useMemo(() => {
     const t = [...new Set(visas.map((v) => v.visaType).filter(Boolean))];
     return t.length ? t : ["tourist", "business", "student", "work"];
